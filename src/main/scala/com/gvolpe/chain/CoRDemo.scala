@@ -10,6 +10,6 @@ object CoRDemo extends App {
 
   val demoRules: List[Rule[DemoState, String]] = GreaterThanFiveRule :: LessThanFiveRule :: EqualsFiveRule :: Nil
 
-  demoRules handle request map (value => println(value))
+  demoRules handle request map (value => assert(value.contentEquals("Equals five")))
 
 }
