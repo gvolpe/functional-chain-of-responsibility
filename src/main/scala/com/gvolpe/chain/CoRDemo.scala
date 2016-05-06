@@ -6,10 +6,22 @@ import RulesHandlerOps._
 
 object CoRDemo extends App {
 
-  val request = DemoState(5)
+  val notEqualRules: List[Rule[DemoState, String]]  = GreaterThanFiveRule :: LessThanFiveRule :: EqualsFiveRule :: Nil
+  val equalRules: List[Rule[DemoState, String]]     = EqualsFiveRule :: Nil
+  val emptyRules: List[Rule[DemoState, String]]     = List.empty[Rule[DemoState, String]]
 
-  val demoRules: List[Rule[DemoState, String]] = GreaterThanFiveRule :: LessThanFiveRule :: EqualsFiveRule :: Nil
+  for {
+    x <-  notEqualRules handle DemoState(15)
+    y <-  emptyRules    handle DemoState(15)
+  } yield {
+    println(s"$x | $y") // This line won't be reached
+  }
 
-  demoRules handle request map (value => assert(value.contentEquals("Equals five")))
+  for {
+    x <- notEqualRules  handle DemoState(15)
+    y <- equalRules     handle DemoState(5)
+  } yield {
+    println(s"$x | $y")
+  }
 
 }
