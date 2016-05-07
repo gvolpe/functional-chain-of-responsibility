@@ -13,6 +13,18 @@ object CoRDemo extends App {
 
   println(">>> Functional version of the Chain of Responsibility pattern <<<")
 
+  // Using rules defined as partial functions
+
+  assert(PFRules.NumberRules(DemoState(51))  == "Greater than five")
+  assert(PFRules.NumberRules(DemoState(5))   == "Equals five")
+  assert(PFRules.NumberRules(DemoState(1))   == "Less than five")
+
+  // Using rules defined as a list of partial functions
+
+  assert(PFRules.PFNumberRules(DemoState(41)) == "Greater than five")
+  assert(PFRules.PFNumberRules(DemoState(5)) == "Equals five")
+  assert(PFRules.PFNumberRules(DemoState(3)) == "Less than five")
+
   // Using tail-recursive solution
 
   notEqualRules applyOnlyOneTailRec DemoState(14) leftMap (s => assert(s == "Greater than five"))
