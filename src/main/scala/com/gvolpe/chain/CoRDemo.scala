@@ -1,27 +1,45 @@
 package com.gvolpe.chain
 
+import scalaz._, Scalaz._
 import rules._
 import NumberRules._
 import RulesHandlerOps._
 
 object CoRDemo extends App {
 
-  val notEqualRules: List[Rule[DemoState, String]]  = GreaterThanFiveRule :: LessThanFiveRule :: EqualsFiveRule :: Nil
-  val equalRules: List[Rule[DemoState, String]]     = EqualsFiveRule :: Nil
-  val emptyRules: List[Rule[DemoState, String]]     = List.empty[Rule[DemoState, String]]
+  val notEqualRules : List[Rule[String, DemoState]] = GreaterThanFiveRule :: LessThanFiveRule :: Nil
+  val equalRules    : List[Rule[String, DemoState]] = EqualsFiveRule :: Nil
+  val emptyRules    : List[Rule[String, DemoState]] = List.empty[Rule[String, DemoState]]
 
-  for {
-    x <-  notEqualRules handle DemoState(15)
-    y <-  emptyRules    handle DemoState(15)
-  } yield {
-    println(s"$x | $y") // This line won't be reached
-  }
+  println(">>> Functional version of the Chain of Responsibility pattern <<<")
 
-  for {
-    x <- notEqualRules  handle DemoState(15)
-    y <- equalRules     handle DemoState(5)
-  } yield {
-    println(s"$x | $y")
-  }
+  // Using tail-recursive solution
 
+  notEqualRules applyOnlyOneTailRec DemoState(14) leftMap (s => assert(s == "Greater than five"))
+  emptyRules    applyOnlyOneTailRec DemoState(14) leftMap (s => assert(true == false)) // Assertion won't be reached
+
+  // Using traverseU (map and then sequenceU)
+
+  notEqualRules traverseU (_.handle(DemoState(2)))  leftMap (s => assert(s == "Less than five"))
+  notEqualRules traverseU (_.handle(DemoState(18))) leftMap (s => assert(s == "Greater than five"))
+  notEqualRules traverseU (_.handle(DemoState(5)))  leftMap (s => assert(s == "Won't reach this assertion. It'll return the right side."))
+
+  equalRules    traverseU (_.handle(DemoState(5)))  leftMap (s => assert(s == "Equals five"))
+
+  val state = DemoState(66)
+  val x = notEqualRules map(_.handle(state)) sequenceU
+  val y = notEqualRules traverseU (_.handle(state))
+
+  assert(x == y)
+
+  // Using traverseU fail-fast technique and swapping sides once is processed
+
+  notEqualRules applyOnlyOneTraverse DemoState(15) map (s => assert(s == "Greater than five"))
+
+  val z = for {
+    x <- notEqualRules  applyOnlyOneTraverse DemoState(2)
+    y <- equalRules     applyOnlyOneTraverse DemoState(5)
+  } yield s"$x | $y"
+
+  z map (s => assert(s == "Less than five | Equals five"))
 }
