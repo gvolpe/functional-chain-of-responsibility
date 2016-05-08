@@ -4,23 +4,30 @@ import com.gvolpe.chain.rules.NumberRules.DemoState
 
 object PFRules {
 
-  type PFRule = PartialFunction[DemoState, String]
+  type PFRule = PartialFunction[DemoState, Option[String]]
 
-  val GreaterThanFiveRule: PFRule = {
-    case DemoState(number) if number > 5 => "Greater than five"
+  val GreaterThanFiveRule = numberRule(_ > 5, "Greater than five")
+  val LessThanFiveRule    = numberRule(_ < 5, "Less than five")
+  val EqualsFiveRule      = numberRule(_ == 5, "Equals five")
+
+  val LongRule: PFRule = {
+    def condition(n : Int) = {
+      (n > 500 && n % 3 == 0 && n % 5 == 0) || (n > 100 && n % 2 == 0)
+    }
+    numberRule(condition, "Long condition result")
   }
 
-  val LessThanFiveRule: PFRule = {
-    case DemoState(number) if number < 5 => "Less than five"
-  }
-
-  val EqualsFiveRule: PFRule = {
-    case DemoState(number) if number == 5 => "Equals five"
+  private def numberRule(f: Int => Boolean, result: String): PFRule = {
+    case DemoState(n) if f(n) => Option(result)
   }
 
   val NumberRules = GreaterThanFiveRule orElse LessThanFiveRule orElse EqualsFiveRule
 
-  private val PFRuleList = GreaterThanFiveRule :: LessThanFiveRule :: EqualsFiveRule :: Nil
-  val PFNumberRules = PFRuleList reduceLeft (_ orElse _)
+  val PFNumberRules = List(
+    LongRule,
+    GreaterThanFiveRule,
+    LessThanFiveRule,
+    EqualsFiveRule
+  ) reduceLeft (_ orElse _)
 
 }

@@ -15,15 +15,16 @@ object CoRDemo extends App {
 
   // Using rules defined as partial functions
 
-  assert(PFRules.NumberRules(DemoState(51))  == "Greater than five")
-  assert(PFRules.NumberRules(DemoState(5))   == "Equals five")
-  assert(PFRules.NumberRules(DemoState(1))   == "Less than five")
+  assert(PFRules.NumberRules(DemoState(51)) contains "Greater than five")
+  assert(PFRules.NumberRules(DemoState(5))  contains "Equals five")
+  assert(PFRules.NumberRules(DemoState(1))  contains "Less than five")
 
   // Using rules defined as a list of partial functions
 
-  assert(PFRules.PFNumberRules(DemoState(41)) == "Greater than five")
-  assert(PFRules.PFNumberRules(DemoState(5)) == "Equals five")
-  assert(PFRules.PFNumberRules(DemoState(3)) == "Less than five")
+  assert(PFRules.PFNumberRules(DemoState(41))   contains "Greater than five")
+  assert(PFRules.PFNumberRules(DemoState(5))    contains "Equals five")
+  assert(PFRules.PFNumberRules(DemoState(3))    contains "Less than five")
+  assert(PFRules.PFNumberRules(DemoState(1500)) contains "Long condition result")
 
   // Using tail-recursive solution
 

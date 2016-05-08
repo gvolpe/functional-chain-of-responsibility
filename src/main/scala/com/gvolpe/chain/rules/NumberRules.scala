@@ -6,19 +6,21 @@ object NumberRules {
 
   case class DemoState(number: Int)
 
-  case object GreaterThanFiveRule extends Rule[String, DemoState] {
+  type FiveRule = Rule[String, DemoState]
+
+  case object GreaterThanFiveRule extends FiveRule {
     override def handle(state: DemoState): String \/ DemoState =
       if (state.number > 5) "Greater than five".left
       else state.right
   }
 
-  case object LessThanFiveRule extends Rule[String, DemoState] {
+  case object LessThanFiveRule extends FiveRule {
     override def handle(state: DemoState): String \/ DemoState =
       if (state.number < 5) "Less than five".left
       else state.right
   }
 
-  case object EqualsFiveRule extends Rule[String, DemoState] {
+  case object EqualsFiveRule extends FiveRule {
     override def handle(state: DemoState): String \/ DemoState =
       if (state.number == 5) "Equals five".left
       else state.right
