@@ -1,4 +1,4 @@
-name := """chain-of-responsibility-scalaz"""
+name := """functional-chain-of-responsibility"""
 
 version := "1.0"
 
