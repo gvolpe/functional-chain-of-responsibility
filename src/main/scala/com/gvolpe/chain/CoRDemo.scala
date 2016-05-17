@@ -29,7 +29,7 @@ object CoRDemo extends App {
   // Using tail-recursive solution
 
   notEqualRules applyOnlyOneTailRec DemoState(14) leftMap (s => assert(s == "Greater than five"))
-  emptyRules    applyOnlyOneTailRec DemoState(14) leftMap (s => assert(true == false)) // Assertion won't be reached
+  emptyRules    applyOnlyOneTailRec DemoState(14) leftMap (s => sys.error("Assertion won't be reached"))
 
   // Using traverseU (map and then sequenceU)
 
